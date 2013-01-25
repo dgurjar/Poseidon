@@ -51,10 +51,10 @@ function onMouseUpMenu(event)
 }
 
 function drawMenuTitle(){
-  ctx.font = "50px Arial";
+  ctx.font = "bold 50px Arial";
   ctx.textAlign = "center";
-  ctx.fillStyle = "black";
-  ctx.fillText("Poseidon",WIDTH*.5, HEIGHT*.2);
+  ctx.fillStyle = "#223947";
+  ctx.fillText("POSEIDON",WIDTH*.5, HEIGHT*.2);
 }
 
 function drawMenuBackground(){
@@ -68,17 +68,20 @@ function drawMenuBackground(){
 function drawMenuButtons(){
   ctx.font = "25px Arial";
   ctx.textAlign = "center";
+
   //button1
   ctx.fillStyle="white";
   roundedRect(ctx,WIDTH*.25,HEIGHT*.3,WIDTH*.5,80,15);
   ctx.fillStyle="black";
   ctx.fillText("Start",WIDTH*.5, HEIGHT*.3+50);
+
   //button2
   ctx.fillStyle="#ffffff";
   roundedRect(ctx,WIDTH*.25,HEIGHT*.3+100,WIDTH*.5,80,15);
   ctx.fillStyle="black";
   ctx.fillText("End",WIDTH*.5, HEIGHT*.3+150);
 }
+
 function initMenu() {
   drawMenuBackground();
   drawMenuTitle();
