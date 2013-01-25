@@ -9,11 +9,15 @@ var timerDelay = 100;
 //Index of the current current. (confusing)
 var currentIndex = -1;
 
+//Set when the user is drawing a current
+var isDrawing = 0;
+
 //Time counters for object spawning that actually always have similar values now that I think of it.
 var projectileCounter = 0;
 var bubbleCounter = 0;
 
-//Constants
+//-----------------------------CONSTANTS
+//######################################
 
 //The lower the threshold, the more often it spawns.
 var PROJECTILE_SPAWN_TRESHOLD = 20;
@@ -25,6 +29,11 @@ var LETTERS = ["H", "E", "L", "P"];
 //Width, Height
 var WIDTH = 400;
 var HEIGHT = 600;
+
+//The number of current blocks along the width and height
+//Note that this must have the same ration as the width and height
+var CURRENTBLOCKS_W = 40;
+var CURRENTBLOCKS_H = 60;
 
 //Initial time
 var TIMER_INITIAL=300;
@@ -100,35 +109,48 @@ function initializeGameInfo(){
   return gameInfo;
 }
 
+/* Given normal x,y coordinates on the canvas, returns the correspoinding block coordinates */
+function getCurrentBlockCoords(x, y){ 
+  return [Math.floor(x/CURRENTBLOCKS_W) , Math.floor(y/CURRENTBLOCKS_H)];
+}
+
 //TODO: Fix the way currents are rendered and stored
 function onMouseDownGame(event)
 {
   //start drawing the current or start creating the current, however we want it implemented.
   var x = event.pageX - canvas.offsetLeft;
   var y = event.pageY - canvas.offsetTop;
+  var blockCoords = getCurrentBlockCoords(x,y);
+  
+  //This is a new current
   var newCurr = new Object();
-  newCurr.sourceCoords = [x,y];
+  newCurr.path = [blockCoords];
   newCurr.ready = false;
   currentIndex = gameInfo.currents.push(newCurr) - 1;
+  isDrawing = 1;
+
   console.log("Mouse Down: " + x + ", " + y);
+}
+
+function onMouseMoveGame(event){
+    if(isDrawing){
+      var x = event.pageX - canvas.offsetLeft;
+      var y = event.pageY - canvas.offsetTop;
+      var blockCoords = getCurrentBlockCoords(x,y);
+      gameInfo.currents[currentIndex].path.push(blockCoords);
+    }
 }
 
 function onMouseUpGame(event){
   //stop drawing the current
   var x = event.pageX - canvas.offsetLeft;
   var y = event.pageY - canvas.offsetTop;
-  var c = gameInfo.currents[currentIndex]
-  var drawDistance = Math.floor(lineDistance(c.sourceCoords[0], c.sourceCoords[1], x, y));
+  var c = gameInfo.currents[currentIndex];
 
-  if(drawDistance < gameInfo.currentRemaining && drawDistance != 0){
-    c.destCoords = [x,y];
-    gameInfo.currentRemaining -= drawDistance;
-    c.ready = true;
-  }
-  else{
-    gameInfo.currents.splice(currentIndex, 1);
-  }
+  //TODO: Re-add current measurement, restrict current from being drawn if not enough "ink"
+  c.ready = true;
   currentIndex = -1;
+  isDrawing = 0;
 }
 
 function initGame(){
@@ -153,15 +175,22 @@ function drawBackground(){
   ctx.fillRect(0,0, WIDTH, HEIGHT);
 }
 
-//TODO: We want to save the currents and then redraw them
+//TODO: We want to save the currents and th/en redraw them
 function drawCurrents(){
   gameInfo.currents.forEach(function(e){
+    //Draw without alpha
     if(e.ready){
-      ctx.beginPath();
-      ctx.moveTo(e.sourceCoords[0], e.sourceCoords[1]);
-      ctx.lineTo(e.destCoords[0], e.destCoords[1]);
-      ctx.closePath();
-      ctx.stroke();
+      for(var i = 0; i<e.path.length; i++){
+        ctx.fillStyle = "rgba(0,0,255,1)";
+        ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, e.path[i][1]*CURRENTBLOCKS_H, CURRENTBLOCKS_W, CURRENTBLOCKS_H);
+      }
+    }
+    //Draw current with alpha since it is not activated yet
+    else{
+      for(var i = 0; i<e.path.length; i++){
+        ctx.fillStyle = "rgba(0,0,255,.1)";
+        ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, e.path[i][1]*CURRENTBLOCKS_H, CURRENTBLOCKS_W, CURRENTBLOCKS_H);
+      }
     }
   });
 }
@@ -352,6 +381,25 @@ function onMouseUp(event){
     break;
   }
 }
+
+function onMouseMove(event){
+  switch(STATE) {
+  case 1: //initialize menu
+    break;
+  case 2: //currently in menu
+    break;
+  case 3: //initialize game
+    break;
+  case 4: //currently in game
+    onMouseMoveGame(event);
+    break;
+  case 5: //initialize end screen
+    break;
+  case 6: //currently in end screen
+    break;
+  }
+}
+
 //---------------------------INITIAL SETUP
 //########################################
 function onTimer(){
@@ -382,6 +430,7 @@ function run(){
   canvas.addEventListener('keydown', onKeyDown, false);
   canvas.addEventListener('mousedown', onMouseDown, false);
   canvas.addEventListener('mouseup', onMouseUp, false);
+  canvas.addEventListener('mousemove', onMouseMove, false);
   canvas.setAttribute('tabindex', 0);
   canvas.focus();
   intervalId = setInterval(onTimer, timerDelay);
