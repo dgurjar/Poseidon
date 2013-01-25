@@ -32,7 +32,6 @@ var TIMER_INITIAL=300;
 //STATE, 1=menu, 2=already in menu, 3=game, 4=already in game, 5=game over, 6=game over
 var STATE=1;
 
-
 //---------------------------SCREEN:MENU
 //######################################
 
@@ -50,15 +49,19 @@ function onMouseUpMenu(event)
     STATE=5;
   }
 }
+
 function drawMenuTitle(){
   ctx.font = "50px Arial";
   ctx.textAlign = "center";
   ctx.fillStyle = "black";
-  ctx.fillText("Drowning!",WIDTH*.5, HEIGHT*.2);
+  ctx.fillText("Poseidon",WIDTH*.5, HEIGHT*.2);
 }
 
-function drawMenuBackground(){ //eventually want to use a pattern for this
-  ctx.fillStyle = "blue";
+function drawMenuBackground(){
+  var grad = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+  grad.addColorStop(1, '#003146');
+  grad.addColorStop(0, '#4E84A6');
+  ctx.fillStyle = grad;
   ctx.fillRect(0,0, WIDTH, HEIGHT);
 }
 
@@ -291,7 +294,7 @@ function lineDistance(x, y, x0, y0){
 
 //---------------------------EVENT LISTENERS
 //##########################################
-function onKeyDown(event){ //todo:update with switch statement depending on STATE 
+function onKeyDown(event){ //todo:update with switch statement depending on STATE
   //r is for reset
   var keyCode = event.keyCode;
   if(keyCode === 82){
@@ -345,7 +348,7 @@ function onTimer(){
     STATE=2;
     break;
   case 2: //currently in menu (not used, if we do a start animation, then we will need it)
-    break; 
+    break;
   case 3: //initialize game
     initGame();
     STATE=4;
