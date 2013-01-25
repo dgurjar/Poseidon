@@ -100,6 +100,7 @@ function initializeGameInfo(){
   return gameInfo;
 }
 
+//TODO: Fix the way currents are rendered and stored
 function onMouseDownGame(event)
 {
   //start drawing the current or start creating the current, however we want it implemented.
@@ -112,6 +113,24 @@ function onMouseDownGame(event)
   console.log("Mouse Down: " + x + ", " + y);
 }
 
+function onMouseUpGame(event){
+  //stop drawing the current
+  var x = event.pageX - canvas.offsetLeft;
+  var y = event.pageY - canvas.offsetTop;
+  var c = gameInfo.currents[currentIndex]
+  var drawDistance = Math.floor(lineDistance(c.sourceCoords[0], c.sourceCoords[1], x, y));
+
+  if(drawDistance < gameInfo.currentRemaining && drawDistance != 0){
+    c.destCoords = [x,y];
+    gameInfo.currentRemaining -= drawDistance;
+    c.ready = true;
+  }
+  else{
+    gameInfo.currents.splice(currentIndex, 1);
+  }
+  currentIndex = -1;
+}
+
 function initGame(){
   gameInfo = initializeGameInfo();
   redrawAllGame();
@@ -119,13 +138,22 @@ function initGame(){
 
 function redrawAllGame(){
   ctx.clearRect(0, 0, 400, 800);
+  drawBackground();
   drawCurrents();
   drawBubbles();
   drawProjectiles();
   drawTimer();
 }
 
+function drawBackground(){
+  var grad = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+  grad.addColorStop(1, '#003146');
+  grad.addColorStop(0, '#4E84A6');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0, WIDTH, HEIGHT);
+}
 
+//TODO: We want to save the currents and then redraw them
 function drawCurrents(){
   gameInfo.currents.forEach(function(e){
     if(e.ready){
@@ -204,24 +232,6 @@ function updateBubbles(){
     }
   }
   updateAndRemoveBubbles();
-}
-
-function onMouseUpGame(event){
-  //stop drawing the current
-  var x = event.pageX - canvas.offsetLeft;
-  var y = event.pageY - canvas.offsetTop;
-  var c = gameInfo.currents[currentIndex]
-  var drawDistance = Math.floor(lineDistance(c.sourceCoords[0], c.sourceCoords[1], x, y));
-
-  if(drawDistance < gameInfo.currentRemaining && drawDistance != 0){
-    c.destCoords = [x,y];
-    gameInfo.currentRemaining -= drawDistance;
-    c.ready = true;
-  }
-  else{
-    gameInfo.currents.splice(currentIndex, 1);
-  }
-  currentIndex = -1;
 }
 
 function addProjectile(){
