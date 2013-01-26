@@ -153,6 +153,20 @@ function onMouseUpGame(event){
   isDrawing = 0;
 }
 
+function onKeyDownGame(event){
+  var keyCode = event.keyCode;
+  //if r
+  if(keyCode === 82){
+    initGame();
+  }
+  //if space
+  else if(keyCode === 32){
+    event.preventDefault(); //stops browser from scrolling by default
+    deleteCurrents();
+  }
+  
+}
+
 function initGame(){
   gameInfo = initializeGameInfo();
   redrawAllGame();
@@ -193,6 +207,10 @@ function drawCurrents(){
       }
     }
   });
+}
+
+function deleteCurrents(){
+  gameInfo.currents=[];
 }
 
 function drawBubbles(){
@@ -336,13 +354,24 @@ function lineDistance(x, y, x0, y0){
 
 //---------------------------EVENT LISTENERS
 //##########################################
-function onKeyDown(event){ //todo:update with switch statement depending on STATE
-  //r is for reset
-  var keyCode = event.keyCode;
-  if(keyCode === 82){
-    initGame();
+function onKeyDown(event){
+  switch(STATE) {
+  case 1: //initialize menu
+    break;
+  case 2: //currently in menu
+    break;
+  case 3: //initialize game
+    break;
+  case 4: //currently in game
+    onKeyDownGame(event);
+    break;
+  case 5: //initialize end screen
+    break;
+  case 6: //currently in end screen
+    break;
   }
 }
+
 
 
 function onMouseDown(event){
