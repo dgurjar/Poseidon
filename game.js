@@ -17,6 +17,9 @@ var isDrawing = 0;
 var projectileCounter = 0;
 var bubbleCounter = 0;
 
+//State, 1=menu, 2= in menu, 3=game, 4=in game, 5=game over, 6=in game over, 7=instructions, 8=in instructions
+var state=1;
+
 //-----------------------------CONSTANTS
 //######################################
 
@@ -39,9 +42,6 @@ var CURRENTBLOCKS_H = 60;
 //Initial time
 var TIMER_INITIAL=300;
 
-//STATE, 1=menu, 2= in menu, 3=game, 4=in game, 5=game over, 6=in game over, 7=instructions, 8=in instructions
-var STATE=1;
-
 
 
 //---------------------------SCREEN:INSTRUCTIONS
@@ -54,7 +54,7 @@ function initInstructions(){
 
 function Instructions() {
   this.instructionsIndex=0;
-  this.instructionsList=[new Instruction('arrows.jpg','Use the left and right arrow keys to navigate the instructions.'),new Instruction('escape.jpg','Hit the escape key at any point (now or in the game) to return to the main menu.'),new Instruction('drowning.jpg',"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")];
+  this.instructionsList=[new Instruction('arrows.jpg','Use the left and right arrow keys to navigate the instructions.'), new Instruction('space.jpg','While playing the game, hit the space button to delete currents'),new Instruction('escape.jpg','Hit the escape key at any point (now or in the game) to return to the main menu.'),new Instruction('drowning.jpg',"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")];
   
   //methods
 
@@ -145,7 +145,7 @@ function onKeyDownInstructions(event){
   var keyCode = event.keyCode;
   if(keyCode===37) instructionsInfo.prevInstruction();
   else if (keyCode===39) instructionsInfo.nextInstruction();
-  else if (keyCode===27) STATE=1;
+  else if (keyCode===27) state=1;
 }
 
 
@@ -159,11 +159,11 @@ function onMouseUpMenu(event)
   console.log("x:"+x+" y:"+y);
   //if box1
   if(x>=(WIDTH*.25) &&x<=(WIDTH*.75)&&y>=(HEIGHT*.3) && y<=(HEIGHT*.3+80)) {
-    STATE=3;
+    state=3;
   }
   //else if box2
   else if(x>=(WIDTH*.25) &&x<=(WIDTH*.75)&&y>=(HEIGHT*.3+100) && y<=(HEIGHT*.3+180)){
-    STATE=7;
+    state=7;
   }
 }
 
@@ -273,7 +273,7 @@ function onKeyDownGame(event){
     deleteCurrents();
   }
   else if(keyCode===27){
-    STATE=1;
+    state=1;
   }
   
 }
@@ -466,7 +466,7 @@ function lineDistance(x, y, x0, y0){
 //---------------------------EVENT LISTENERS
 //##########################################
 function onKeyDown(event){
-  switch(STATE) {
+  switch(state) {
   case 1: //initialize menu
     break;
   case 2: //currently in menu
@@ -491,7 +491,7 @@ function onKeyDown(event){
 
 
 function onMouseDown(event){
-  switch(STATE) {
+  switch(state) {
   case 1: //initialize menu
     break;
   case 2: //currently in menu
@@ -509,7 +509,7 @@ function onMouseDown(event){
 }
 
 function onMouseUp(event){
-  switch(STATE) {
+  switch(state) {
   case 1: //initialize menu
     break;
   case 2: //currently in menu
@@ -528,7 +528,7 @@ function onMouseUp(event){
 }
 
 function onMouseMove(event){
-  switch(STATE) {
+  switch(state) {
   case 1: //initialize menu
     break;
   case 2: //currently in menu
@@ -548,35 +548,35 @@ function onMouseMove(event){
 //---------------------------INITIAL SETUP
 //########################################
 function onTimer(){ //todo:add default state to everything
-  switch(STATE) {
+  switch(state) {
   case 1: //initialize menu
     initMenu();
-    STATE=2;
+    state=2;
     break;
   case 2: //currently in menu (not used, if we do a start animation, then we will need it)
     break;
   case 3: //initialize game
     initGame();
-    STATE=4;
+    state=4;
     break;
   case 4: //currently in game
     updateGame();
     break;
   case 5: //initialize end screen
     initEndScreen();
-    STATE=6;
+    state=6;
     break;
   case 6: //currently in end screen
     break;
   case 7: //initialize instructions
     initInstructions();
-    STATE=8; 
+    state=8; 
     break;
   case 8: //in instructions
     instructionsInfo.drawCurrInstruction();
     break;
   default:
-    STATE=1;
+    state=1;
     break;
   }
 }
