@@ -143,8 +143,11 @@ function drawInstructionsTitle(){
 
 function onKeyDownInstructions(event){
   var keyCode = event.keyCode;
+  //left key
   if(keyCode===37) instructionsInfo.prevInstruction();
+  //right key
   else if (keyCode===39) instructionsInfo.nextInstruction();
+  //escape key
   else if (keyCode===27) state=1;
 }
 
