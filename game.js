@@ -2,6 +2,7 @@ var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext('2d');
 
 var gameInfo;
+var instructionsInfo;
 
 var intervalId;
 var timerDelay = 100;
@@ -38,8 +39,115 @@ var CURRENTBLOCKS_H = 60;
 //Initial time
 var TIMER_INITIAL=300;
 
-//STATE, 1=menu, 2=already in menu, 3=game, 4=already in game, 5=game over, 6=game over
+//STATE, 1=menu, 2= in menu, 3=game, 4=in game, 5=game over, 6=in game over, 7=instructions, 8=in instructions
 var STATE=1;
+
+
+
+//---------------------------SCREEN:INSTRUCTIONS
+//##############################################
+function initInstructions(){
+  drawMenuBackground();
+  drawInstructionsTitle();
+  instructionsInfo=new Instructions();
+}
+
+function Instructions() {
+  this.instructionsIndex=0;
+  this.instructionsList=[new Instruction('arrows.jpg','Use the left and right arrow keys to navigate the instructions.'),new Instruction('escape.jpg','Hit the escape key at any point (now or in the game) to return to the main menu.'),new Instruction('drowning.jpg',"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")];
+  
+  //methods
+
+  this.nextInstruction=function(){
+    if(this.instructionsIndex!==this.instructionsList.length-1)this.instructionsIndex+=1;
+  }
+
+  this.prevInstruction=function(){
+    if(this.instructionsIndex!==0) this.instructionsIndex-=1;
+  }
+  
+  this.drawInstruction=function(instruct){
+    var img = new Image();
+    //load image
+    img.onload = function() {
+      ctx.drawImage(img, WIDTH*.1, HEIGHT*.2, WIDTH*.8, HEIGHT*.3);
+    }
+    img.src =instruct.imgsrc;
+
+    //write text
+    ctx.font = "15px Arial";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "white";
+
+    var strHeight=HEIGHT*.5+50;
+    var arr=this.splitString(instruct.txt);
+    var numLines=this.numLines(arr);
+    for(var i=0;i<numLines;i++){
+      ctx.fillText(arr[i],WIDTH*.5, strHeight);
+      strHeight+=19;
+    }
+  }
+
+  //sets the number of lines for a given array of text
+  this.numLines=function(arr){
+    if(arr.length<12) return arr.length
+    else return 12;
+  }
+
+  //splits string into an array<=50 total 
+  //chars each depending on size of last word
+  this.splitString=function(x){
+    var arr=[];
+    var pointer1=0;
+    var pointer2=0;
+
+    while(pointer1<x.length){
+      temp=x.substring(pointer1,pointer1+50);
+      if(temp.length<50) {
+        arr.push(temp);
+        break;
+      }
+      else {
+        pointer2=pointer1+temp.lastIndexOf(" ");
+        arr.push(x.substring(pointer1,pointer2));
+      }
+      pointer1=pointer2;
+    }
+    return arr;
+  }
+
+
+  this.drawCurrInstruction=function(){
+    //clears the current space
+    ctx.clearRect(0,0,WIDTH,HEIGHT);
+    drawMenuBackground();
+    drawInstructionsTitle();
+    this.drawInstruction(this.instructionsList[this.instructionsIndex]);
+  }
+}
+
+//image should be in ratio of 16x9
+//if not it will get distorted when drawn
+function Instruction(imgsrc,txt){
+  this.txt=txt;
+  this.imgsrc=imgsrc;
+}
+
+function drawInstructionsTitle(){
+  ctx.font = "50px Arial";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#223947";
+  ctx.fillText("Game Play",WIDTH*.5, HEIGHT*.12);
+}
+
+
+function onKeyDownInstructions(event){
+  var keyCode = event.keyCode;
+  if(keyCode===37) instructionsInfo.prevInstruction();
+  else if (keyCode===39) instructionsInfo.nextInstruction();
+  else if (keyCode===27) STATE=1;
+}
+
 
 //---------------------------SCREEN:MENU
 //######################################
@@ -55,7 +163,7 @@ function onMouseUpMenu(event)
   }
   //else if box2
   else if(x>=(WIDTH*.25) &&x<=(WIDTH*.75)&&y>=(HEIGHT*.3+100) && y<=(HEIGHT*.3+180)){
-    STATE=5;
+    STATE=7;
   }
 }
 
@@ -82,13 +190,13 @@ function drawMenuButtons(){
   ctx.fillStyle="white";
   roundedRect(ctx,WIDTH*.25,HEIGHT*.3,WIDTH*.5,80,15);
   ctx.fillStyle="black";
-  ctx.fillText("Start",WIDTH*.5, HEIGHT*.3+50);
+  ctx.fillText("Begin Game",WIDTH*.5, HEIGHT*.3+50);
 
   //button2
   ctx.fillStyle="#ffffff";
   roundedRect(ctx,WIDTH*.25,HEIGHT*.3+100,WIDTH*.5,80,15);
   ctx.fillStyle="black";
-  ctx.fillText("End",WIDTH*.5, HEIGHT*.3+150);
+  ctx.fillText("Instructions",WIDTH*.5, HEIGHT*.3+150);
 }
 
 function initMenu() {
@@ -163,6 +271,9 @@ function onKeyDownGame(event){
   else if(keyCode === 32){
     event.preventDefault(); //stops browser from scrolling by default
     deleteCurrents();
+  }
+  else if(keyCode===27){
+    STATE=1;
   }
   
 }
@@ -369,6 +480,11 @@ function onKeyDown(event){
     break;
   case 6: //currently in end screen
     break;
+  case 7: //initialize instructions
+    break;
+  case 8: //currently in instructions
+    onKeyDownInstructions(event);
+    break;
   }
 }
 
@@ -431,7 +547,7 @@ function onMouseMove(event){
 
 //---------------------------INITIAL SETUP
 //########################################
-function onTimer(){
+function onTimer(){ //todo:add default state to everything
   switch(STATE) {
   case 1: //initialize menu
     initMenu();
@@ -451,6 +567,16 @@ function onTimer(){
     STATE=6;
     break;
   case 6: //currently in end screen
+    break;
+  case 7: //initialize instructions
+    initInstructions();
+    STATE=8; 
+    break;
+  case 8: //in instructions
+    instructionsInfo.drawCurrInstruction();
+    break;
+  default:
+    STATE=1;
     break;
   }
 }
