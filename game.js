@@ -13,6 +13,9 @@ var currentIndex = -1;
 //Set when the user is drawing a current
 var isDrawing = 0;
 
+//The last block the user was drawing
+var lastBlock;
+
 //Time counters for object spawning that actually always have similar values now that I think of it.
 var projectileCounter = 0;
 var bubbleCounter = 0;
@@ -217,12 +220,18 @@ function initializeGameInfo(){
   gameInfo.projectiles = [];
   gameInfo.bubbles = [];
   gameInfo.currents = [];
+  gameInfo.grid = {};
   return gameInfo;
 }
 
 /* Given normal x,y coordinates on the canvas, returns the correspoinding block coordinates */
 function getCurrentBlockCoords(x, y){ 
   return [Math.floor(x/CURRENTBLOCKS_W) , Math.floor(y/CURRENTBLOCKS_H)];
+}
+
+/* Given a block's coordinates, returns whether or not that block is in a current */
+function blockClaimed(blockCoords){
+  return gameInfo.grid[blockCoords] || false;  //uses the falsiness of the undefined value.
 }
 
 //TODO: Fix the way currents are rendered and stored
@@ -233,35 +242,62 @@ function onMouseDownGame(event)
   var y = event.pageY - canvas.offsetTop;
   var blockCoords = getCurrentBlockCoords(x,y);
   
-  //This is a new current
-  var newCurr = new Object();
-  newCurr.path = [blockCoords];
-  newCurr.ready = false;
-  currentIndex = gameInfo.currents.push(newCurr) - 1;
-  isDrawing = 1;
+  if(!(blockClaimed(blockCoords))){
+    //This is a new current
+    var newCurr = new Object();
+    newCurr.path = [blockCoords];
+    newCurr.ready = false;
+    currentIndex = gameInfo.currents.push(newCurr) - 1;
+    isDrawing = 1;
+
+    gameInfo.grid[blockCoords] = true;
+
+    lastBlock = blockCoords;
+  }
 
   console.log("Mouse Down: " + x + ", " + y);
 }
+
 
 function onMouseMoveGame(event){
     if(isDrawing){
       var x = event.pageX - canvas.offsetLeft;
       var y = event.pageY - canvas.offsetTop;
       var blockCoords = getCurrentBlockCoords(x,y);
-      gameInfo.currents[currentIndex].path.push(blockCoords);
+      if(!(blockClaimed(blockCoords))){
+        gameInfo.currents[currentIndex].path.push(blockCoords);
+        gameInfo.grid[blockCoords] = true;
+        lastBlock = blockCoords;
+      }
+      //if the user draws a current that hits another current, rather than warping underwater space-time, just delete the current and stop drawing.
+      else{
+        if(!(blockCoords.toString() == lastBlock.toString())){
+          isDrawing = 0;
+          gameInfo.currents[currentIndex].path.forEach(function(e){
+            gameInfo.grid[e] = false;
+          });
+          gameInfo.currents.pop();
+          currentIndex = -1;
+          lastBlock = null;
+          console.log("stopped drawing.");
+        }
+      }
     }
 }
 
 function onMouseUpGame(event){
-  //stop drawing the current
-  var x = event.pageX - canvas.offsetLeft;
-  var y = event.pageY - canvas.offsetTop;
-  var c = gameInfo.currents[currentIndex];
+  if(isDrawing){
+    //stop drawing the current
+    var x = event.pageX - canvas.offsetLeft;
+    var y = event.pageY - canvas.offsetTop;
+    var c = gameInfo.currents[currentIndex];
 
-  //TODO: Re-add current measurement, restrict current from being drawn if not enough "ink"
-  c.ready = true;
-  currentIndex = -1;
-  isDrawing = 0;
+    //TODO: Re-add current measurement, restrict current from being drawn if not enough "ink"
+    c.ready = true;
+    currentIndex = -1;
+    isDrawing = 0;
+    lastBlock = null;
+  }
 }
 
 function onKeyDownGame(event){
@@ -303,7 +339,7 @@ function drawBackground(){
   ctx.fillRect(0,0, WIDTH, HEIGHT);
 }
 
-//TODO: We want to save the currents and th/en redraw them
+//TODO: We want to save the currents and then redraw them
 function drawCurrents(){
   gameInfo.currents.forEach(function(e){
     //Draw without alpha
@@ -325,6 +361,7 @@ function drawCurrents(){
 
 function deleteCurrents(){
   gameInfo.currents=[];
+  gameInfo.grid={};
 }
 
 function drawBubbles(){
