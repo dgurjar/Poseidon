@@ -20,7 +20,7 @@ var lastBlock;
 var projectileCounter = 0;
 var bubbleCounter = 0;
 
-//State, 1=menu, 2= in menu, 3=game, 4=in game, 5=game over, 6=in game over, 7=instructions, 8=in instructions
+//State, 1=menu, 2= in menu, 3=game, 4=in game, 5=game over, 6=in game over, 7=instructions, 8=in instructions,9=difficulty, 10=in difficulty
 var state=1;
 
 //-----------------------------CONSTANTS
@@ -39,8 +39,8 @@ var HEIGHT = 600;
 
 //The number of current blocks along the width and height
 //Note that this must have the same ration as the width and height
-var CURRENTBLOCKS_W = 40;
-var CURRENTBLOCKS_H = 60;
+var CURRENTBLOCKS_W = 20;
+var CURRENTBLOCKS_H = 30;
 
 //Initial time
 var TIMER_INITIAL=300;
@@ -158,6 +158,85 @@ function onKeyDownInstructions(event){
   else if (keyCode===27) state=1;
 }
 
+//---------------------------SCREEN:DIFFICULTY
+//############################################
+function initDifficulty() {
+  drawMenuBackground();
+  drawDifficultyTitle();
+  drawDifficultyButtons();
+}
+
+function onMouseUpDifficulty(event)
+{
+  var x = event.pageX - canvas.offsetLeft;
+  var y = event.pageY - canvas.offsetTop;
+  console.log("x:"+x+" y:"+y);
+  //if button1
+  if(x>=(WIDTH*.25) &&x<=(WIDTH*.75)&&y>=(HEIGHT*.3) && y<=(HEIGHT*.3+80)) {
+    setEasy();
+    state=3;
+  }
+  //else button2
+  else if(x>=(WIDTH*.25) &&x<=(WIDTH*.75)&&y>=(HEIGHT*.3+100) && y<=(HEIGHT*.3+180)){
+    setMedium();
+    state=3;
+  }
+
+  //else if button3
+  else if(x>=(WIDTH*.25) &&x<=(WIDTH*.75)&&y>=(HEIGHT*.3+200) && y<=(HEIGHT*.3+280)){
+    setHard();
+    state=3;
+  }
+}
+
+function setEasy(){ //todo: change numbers according to difficulty
+  PROJECTILE_SPAWN_TRESHOLD = 20;
+  BUBBLE_SPAWN_THRESHOLD = 30;
+  TIMER_INITIAL = 300;
+}
+
+function setMedium(){ //todo: change numbers according to difficulty
+  PROJECTILE_SPAWN_TRESHOLD = 20;
+  BUBBLE_SPAWN_THRESHOLD = 30;
+  TIMER_INITIAL = 300;
+}
+
+function setHard(){ //todo: change numbers according to difficulty
+  PROJECTILE_SPAWN_TRESHOLD = 20;
+  BUBBLE_SPAWN_THRESHOLD = 30;
+  TIMER_INITIAL = 300;
+}
+
+function drawDifficultyTitle(){
+  ctx.font = "50px Arial";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#223947";
+  ctx.fillText("Difficulty",WIDTH*.5, HEIGHT*.2);
+}
+
+function drawDifficultyButtons(){
+  ctx.font = "25px Arial";
+  ctx.textAlign = "center";
+
+  //button1
+  ctx.fillStyle="white";
+  roundedRect(ctx,WIDTH*.25,HEIGHT*.3,WIDTH*.5,80,15);
+  ctx.fillStyle="black";
+  ctx.fillText("Easy",WIDTH*.5, HEIGHT*.3+50);
+
+  //button2
+  ctx.fillStyle="#ffffff";
+  roundedRect(ctx,WIDTH*.25,HEIGHT*.3+100,WIDTH*.5,80,15);
+  ctx.fillStyle="black";
+  ctx.fillText("Medium",WIDTH*.5, HEIGHT*.3+150);
+
+  //button3
+  ctx.fillStyle="#ffffff";
+  roundedRect(ctx,WIDTH*.25,HEIGHT*.3+200,WIDTH*.5,80,15);
+  ctx.fillStyle="black";
+  ctx.fillText("Hard",WIDTH*.5, HEIGHT*.3+250);
+}
+
 
 //---------------------------SCREEN:MENU
 //######################################
@@ -169,7 +248,7 @@ function onMouseUpMenu(event)
   console.log("x:"+x+" y:"+y);
   //if box1
   if(x>=(WIDTH*.25) &&x<=(WIDTH*.75)&&y>=(HEIGHT*.3) && y<=(HEIGHT*.3+80)) {
-    state=3;
+    state=9;
   }
   //else if box2
   else if(x>=(WIDTH*.25) &&x<=(WIDTH*.75)&&y>=(HEIGHT*.3+100) && y<=(HEIGHT*.3+180)){
@@ -320,6 +399,7 @@ function onKeyDownGame(event){
     event.preventDefault(); //stops browser from scrolling by default
     deleteCurrents();
   }
+  //if escape
   else if(keyCode===27){
     state=1;
   }
@@ -662,6 +742,11 @@ function onMouseUp(event){
     break;
   case 6: //currently in end screen
     break;
+  case 9:
+    break;
+  case 10:
+    onMouseUpDifficulty(event);
+    break;
   }
 }
 
@@ -712,6 +797,12 @@ function onTimer(){ //todo:add default state to everything
     break;
   case 8: //in instructions
     instructionsInfo.drawCurrInstruction();
+    break;
+  case 9: //in difficulty
+    initDifficulty();
+    state=10;
+    break;
+  case 10:
     break;
   default:
     state=1;
