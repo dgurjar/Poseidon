@@ -67,10 +67,12 @@ function Instructions() {
 
   this.nextInstruction=function(){
     if(this.instructionsIndex!==this.instructionsList.length-1)this.instructionsIndex+=1;
+    this.drawCurrInstruction();
   }
 
   this.prevInstruction=function(){
     if(this.instructionsIndex!==0) this.instructionsIndex-=1;
+    this.drawCurrInstruction();
   }
   
   this.drawInstruction=function(instruct){
@@ -793,10 +795,10 @@ function onTimer(){ //todo:add default state to everything
     break;
   case 7: //initialize instructions
     initInstructions();
+    instructionsInfo.drawCurrInstruction();
     state=8; 
     break;
   case 8: //in instructions
-    instructionsInfo.drawCurrInstruction();
     break;
   case 9: //in difficulty
     initDifficulty();
