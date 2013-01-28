@@ -23,6 +23,9 @@ var bubbleCounter = 0;
 //State, 1=menu, 2= in menu, 3=game, 4=in game, 5=game over, 6=in game over, 7=instructions, 8=in instructions,9=difficulty, 10=in difficulty
 var state=1;
 
+//A counter for drawing the path of the current
+var animationCounter = 0;
+
 //-----------------------------CONSTANTS
 //######################################
 
@@ -39,8 +42,8 @@ var HEIGHT = 600;
 
 //The number of current blocks along the width and height
 //Note that this must have the same ration as the width and height
-var CURRENTBLOCKS_W = 20;
-var CURRENTBLOCKS_H = 30;
+var CURRENTBLOCKS_W = 10;
+var CURRENTBLOCKS_H = 10;
 
 //Initial time
 var TIMER_INITIAL=300;
@@ -434,7 +437,10 @@ function drawCurrents(){
     //Draw without alpha
     if(e.ready){
       for(var i = 0; i<e.path.length; i++){
-        ctx.fillStyle = "rgba(0,0,255,1)";
+        if(i == (animationCounter%e.path.length))
+          ctx.fillStyle = "rgba(0,0,255,.2)";
+        else
+          ctx.fillStyle = "rgba(0,0,255,1)";
         ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, e.path[i][1]*CURRENTBLOCKS_H, CURRENTBLOCKS_W, CURRENTBLOCKS_H);
       }
     }
@@ -648,6 +654,8 @@ function updateGame(){
       gameInfo.timer -= 1;
     }
     redrawAllGame();
+    //TODO: Change 100 to the max length of any 1 current
+    animationCounter = (animationCounter>=100) ? 0 : animationCounter+1;
 }
 //---------------------------SCREEN:END
 //#####################################
