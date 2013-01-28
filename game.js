@@ -45,6 +45,10 @@ var CURRENTBLOCKS_H = 60;
 //Initial time
 var TIMER_INITIAL=300;
 
+//Sizes
+var BUBBLE_SIZE = 20;
+var PROJECTILE_SIZE = 60;
+
 
 
 //---------------------------SCREEN:INSTRUCTIONS
@@ -229,6 +233,11 @@ function getCurrentBlockCoords(x, y){
   return [Math.floor(x/CURRENTBLOCKS_W) , Math.floor(y/CURRENTBLOCKS_H)];
 }
 
+/* Given deez bullshit fuckin' "BlockCoords," returns the coordinates in a manner that makes real sense. */
+function blockCoordsToRealCoords(bx, by){
+  return [bx*CURRENTBLOCKS_W + Math.floor(CURRENTBLOCKS_W/2), by*CURRENTBLOCKS_H + Math.floor(CURRENTBLOCKS_H/2)];
+}
+
 /* Given a block's coordinates, returns whether or not that block is in a current */
 function blockClaimed(blockCoords){
   return gameInfo.grid[blockCoords] || false;  //uses the falsiness of the undefined value.
@@ -255,7 +264,7 @@ function onMouseDownGame(event)
     lastBlock = blockCoords;
   }
 
-  console.log("Mouse Down: " + x + ", " + y);
+  //console.log("Mouse Down: " + x + ", " + y);
 }
 
 
@@ -367,7 +376,7 @@ function deleteCurrents(){
 function drawBubbles(){
   gameInfo.bubbles.forEach(function(e){
     ctx.beginPath();
-    ctx.arc(e.position[0], e.position[1], 20, 0, 2*Math.PI, true);
+    ctx.arc(e.position[0], e.position[1], BUBBLE_SIZE, 0, 2*Math.PI, true);
     ctx.closePath();
     ctx.stroke();
     ctx.font = "30px Arial";
@@ -380,9 +389,8 @@ function drawBubbles(){
 function drawProjectiles(){
   gameInfo.projectiles.forEach(function(e){
     ctx.beginPath();
-    var size = 30;
     ctx.fillStyle = "red";
-    ctx.fillRect(e.position[0]-size, e.position[1]-size, size*2, size*2);
+    ctx.fillRect(e.position[0]-PROJECTILE_SIZE/2, e.position[1]-PROJECTILE_SIZE/2, PROJECTILE_SIZE, PROJECTILE_SIZE);
   });
 }
 
@@ -405,6 +413,7 @@ function addBubble(){
   bubble = new Object();
   bubble.letter = LETTERS[Math.floor(Math.random()*4)];
   bubble.position = [Math.floor(Math.random()*WIDTH + 1), HEIGHT];
+  bubble.currentPath = [];
   gameInfo.bubbles.push(bubble);
   console.log("bubble added")
 }
@@ -412,7 +421,9 @@ function addBubble(){
 function updateAndRemoveBubbles(){
   var toRemove = [];
   gameInfo.bubbles.forEach(function(e, i){
-    e.position[1] = e.position[1] - 5;
+    if(e.currentPath.length === 0){
+      e.position[1] = e.position[1] - 5;
+    }
     if(e.position[1] <= 0){
       toRemove.push(i);
     }
@@ -463,9 +474,96 @@ function updateProjectiles(){
   updateAndRemoveProjectiles();
 }
 
+/* Helper function to see if 2 LTRB rectangles overlap */
+function isOverlapping(a, b){
+  return !(a[0] > b[2] || a[1] > b[3] || a[2] < b[0] || a[3] < b[1]);
+}
+
+function popBubbles(bcoords, pcoords){
+  var toClear = [];
+  bcoords.forEach(function(bc, i){
+    var collisionDetected = pcoords.some(function(pc){
+      return isOverlapping(bc, pc);
+    });
+    if(collisionDetected){
+      toClear.push(i);
+    }
+  });
+
+  toClear.forEach(function(e){
+    gameInfo.bubbles.splice(e, 1);
+  });
+}
+
+function lockCurrentBubbles(bcoords){
+  bcoords.forEach(function(bc, i){
+    //so bubbles will never enter a current from above
+    var blockCoords = [];
+    var setPath = function(c){
+      if(c.ready){
+          c.path.some(function(coord, j, a){
+            if(blockCoords.toString() === coord.toString()){
+              gameInfo.bubbles[i].currentPath = a.slice(j, a.length);
+              return true;
+            }
+            return false;
+          });
+        }
+      }
+    if(gameInfo.grid[getCurrentBlockCoords(bc[0], bc[1])]){
+      blockCoords = getCurrentBlockCoords(bc[0], bc[1]);
+    }
+    else if(gameInfo.grid[getCurrentBlockCoords(bc[2], bc[1])]){
+      blockCoords = getCurrentBlockCoords(bc[2], bc[1]);
+    }
+    if(gameInfo.bubbles[i].currentPath.length === 0){
+      gameInfo.currents.some(setPath);
+    }
+  });
+}
+
+function advanceLockedBubbles(){
+  gameInfo.bubbles.forEach(function(b){
+    if(b.currentPath.length !== 0){
+      var destCoords = blockCoordsToRealCoords(b.currentPath[0][0], b.currentPath[0][1]);
+      var xdist = destCoords[0] - b.position[0];
+      var ydist = destCoords[1] - b.position[1];
+      //console.log("destcoords x: " + destCoords[0] + " destCoords y: " + destCoords[1]);
+      //console.log("Before: " + b.position[0] + ", " + b.position[1]);
+      //console.log("xdist: " + xdist + ", ydist: " + ydist);
+      b.position[0] = b.position[0] + (xdist > 0 ? Math.floor(xdist, 1) : Math.ceil(xdist, -1));
+      b.position[1] = b.position[1] + (ydist > 0 ? Math.floor(ydist, 1) : Math.ceil(ydist, -1));
+      //console.log("+      " + (xdist > 0 ? Math.floor(xdist, 3) : Math.ceil(xdist, -3)) + ", " + (ydist > 0 ? Math.floor(ydist, 3) : Math.ceil(ydist, -3)));
+      //console.log("After: " + b.position[0] + ", " + b.position[1]);
+      if(b.position.toString() === destCoords.toString()){
+        b.currentPath.splice(0, 1);
+        //this is a temporary solution to a bubble being caught in its last block of current forever.
+        if(b.currentPath.length === 0){
+          b.position[1] -= CURRENTBLOCKS_H / 2 + 1;
+        }
+      }
+    }
+  })
+}
+
+function detectCollisions(){
+  var bubblecoords = [];
+  gameInfo.bubbles.forEach(function(b){
+    bubblecoords.push([b.position[0]-BUBBLE_SIZE/2, b.position[1]-BUBBLE_SIZE/2, b.position[0]+BUBBLE_SIZE/2, b.position[1]+BUBBLE_SIZE/2]);
+  });
+  var projectilecoords = [];
+  gameInfo.projectiles.forEach(function(p){
+    projectilecoords.push([p.position[0]-PROJECTILE_SIZE/2, p.position[1]-PROJECTILE_SIZE/2, p.position[0]+PROJECTILE_SIZE/2, p.position[1]+PROJECTILE_SIZE/2]);
+  });
+  popBubbles(bubblecoords, projectilecoords);
+  lockCurrentBubbles(bubblecoords);
+  advanceLockedBubbles();
+}
+
 function updateGame(){
-  updateBubbles();
+    updateBubbles();
     updateProjectiles();
+    detectCollisions();
     if(gameInfo.timer != 0){
       gameInfo.timer -= 1;
     }
