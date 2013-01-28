@@ -443,6 +443,12 @@ function drawCurrents(){
           ctx.fillStyle = "rgba(0,0,255,.2)";
         else
           ctx.fillStyle = "rgba(0,0,255,1)";
+
+        //One wave above
+        ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, (e.path[i][1]+2)*(CURRENTBLOCKS_H), CURRENTBLOCKS_W, CURRENTBLOCKS_H);
+        //One wave below
+        ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, (e.path[i][1]-2)*(CURRENTBLOCKS_H), CURRENTBLOCKS_W, CURRENTBLOCKS_H);        
+        //Main wave
         ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, e.path[i][1]*CURRENTBLOCKS_H, CURRENTBLOCKS_W, CURRENTBLOCKS_H);
       }
     }
@@ -450,6 +456,11 @@ function drawCurrents(){
     else{
       for(var i = 0; i<e.path.length; i++){
         ctx.fillStyle = "rgba(0,0,255,.1)";
+        //One wave above
+        ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, (e.path[i][1]+2)*(CURRENTBLOCKS_H), CURRENTBLOCKS_W, CURRENTBLOCKS_H);
+        //One wave below
+        ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, (e.path[i][1]-2)*(CURRENTBLOCKS_H), CURRENTBLOCKS_W, CURRENTBLOCKS_H);        
+        //Main wave
         ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, e.path[i][1]*CURRENTBLOCKS_H, CURRENTBLOCKS_W, CURRENTBLOCKS_H);
       }
     }
@@ -463,10 +474,12 @@ function deleteCurrents(){
 
 function drawBubbles(){
   gameInfo.bubbles.forEach(function(e){
+    ctx.fillStyle = "rgba(255,255,255,.5)";
     ctx.beginPath();
     ctx.arc(e.position[0], e.position[1], BUBBLE_SIZE, 0, 2*Math.PI, true);
     ctx.closePath();
     ctx.stroke();
+    ctx.fill();
     ctx.font = "30px Arial";
     ctx.textAlign = "center";
     ctx.fillStyle = "black";
