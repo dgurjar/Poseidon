@@ -317,7 +317,7 @@ function getCurrentBlockCoords(x, y){
   return [Math.floor(x/CURRENTBLOCKS_W) , Math.floor(y/CURRENTBLOCKS_H)];
 }
 
-/* Given deez bullshit fuckin' "BlockCoords," returns the coordinates in a manner that makes real sense. */
+/* Given a set of block coordinates, returns the x,y coordinates of the center of that block. */
 function blockCoordsToRealCoords(bx, by){
   return [bx*CURRENTBLOCKS_W + Math.floor(CURRENTBLOCKS_W/2), by*CURRENTBLOCKS_H + Math.floor(CURRENTBLOCKS_H/2)];
 }
@@ -470,6 +470,9 @@ function drawCurrents(){
 function deleteCurrents(){
   gameInfo.currents=[];
   gameInfo.grid={};
+  gameInfo.bubbles.forEach(function(e){
+    e.currentPath = [];
+  });
 }
 
 function drawBubbles(){
@@ -516,7 +519,23 @@ function addBubble(){
   bubble.position = [Math.floor(Math.random()*WIDTH + 1), HEIGHT];
   bubble.currentPath = [];
   gameInfo.bubbles.push(bubble);
-  console.log("bubble added")
+}
+
+function determineBubbleSuccess(letter, x){
+  switch(letter){
+    case "H":
+      return (x >=0 && x <= Math.floor(WIDTH/4));
+      break;
+    case "E":
+      return (x >= Math.floor(WIDTH/4) && x <= Math.floor(WIDTH/2));
+      break;
+    case "L":
+      return (x >= Math.floor(WIDTH/2) && x <= (WIDTH - Math.floor(WIDTH/4)));
+      break;
+    case "P":
+      return (x >= (WIDTH - Math.floor(WIDTH/4)) && x <= WIDTH);
+      break;
+  }
 }
 
 function updateAndRemoveBubbles(){
@@ -527,6 +546,9 @@ function updateAndRemoveBubbles(){
     }
     if(e.position[1] <= 0){
       toRemove.push(i);
+      if(determineBubbleSuccess(e.letter, e.position[0])){
+        //TODO: Increment the score or reward the player here.
+      }
     }
   });
   toRemove.forEach(function(e){
@@ -549,7 +571,6 @@ function addProjectile(){
   proj.speed = Math.floor(Math.random()*5 + 1);
   proj.position = [Math.floor(Math.random()*WIDTH + 1), -50];
   gameInfo.projectiles.push(proj);
-  console.log("projectile added.");
 }
 
 function updateAndRemoveProjectiles(){
@@ -657,6 +678,10 @@ function detectCollisions(){
     projectilecoords.push([p.position[0]-PROJECTILE_SIZE/2, p.position[1]-PROJECTILE_SIZE/2, p.position[0]+PROJECTILE_SIZE/2, p.position[1]+PROJECTILE_SIZE/2]);
   });
   popBubbles(bubblecoords, projectilecoords);
+  bubblecoords = [];
+  gameInfo.bubbles.forEach(function(b){
+    bubblecoords.push([b.position[0]-BUBBLE_SIZE/2, b.position[1]-BUBBLE_SIZE/2, b.position[0]+BUBBLE_SIZE/2, b.position[1]+BUBBLE_SIZE/2]);
+  });
   lockCurrentBubbles(bubblecoords);
   advanceLockedBubbles();
 }
