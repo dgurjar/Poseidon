@@ -23,6 +23,9 @@ var bubbleCounter = 0;
 //State, 1=menu, 2= in menu, 3=game, 4=in game, 5=game over, 6=in game over, 7=instructions, 8=in instructions,9=difficulty, 10=in difficulty, 11=winning, 12=in winning
 var state=1;
 
+//A counter for drawing the path of the current
+var animationCounter = 0;
+
 //-----------------------------CONSTANTS
 //######################################
 
@@ -39,8 +42,8 @@ var HEIGHT = 600;
 
 //The number of current blocks along the width and height
 //Note that this must have the same ration as the width and height
-var CURRENTBLOCKS_W = 20;
-var CURRENTBLOCKS_H = 30;
+var CURRENTBLOCKS_W = 10;
+var CURRENTBLOCKS_H = 10;
 
 //Initial time
 var TIMER_INITIAL=300;
@@ -436,7 +439,16 @@ function drawCurrents(){
     //Draw without alpha
     if(e.ready){
       for(var i = 0; i<e.path.length; i++){
-        ctx.fillStyle = "rgba(0,0,255,1)";
+        if(i == (animationCounter%e.path.length))
+          ctx.fillStyle = "rgba(0,0,255,.2)";
+        else
+          ctx.fillStyle = "rgba(0,0,255,1)";
+
+        //One wave above
+        ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, (e.path[i][1]+2)*(CURRENTBLOCKS_H), CURRENTBLOCKS_W, CURRENTBLOCKS_H);
+        //One wave below
+        ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, (e.path[i][1]-2)*(CURRENTBLOCKS_H), CURRENTBLOCKS_W, CURRENTBLOCKS_H);        
+        //Main wave
         ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, e.path[i][1]*CURRENTBLOCKS_H, CURRENTBLOCKS_W, CURRENTBLOCKS_H);
       }
     }
@@ -444,6 +456,11 @@ function drawCurrents(){
     else{
       for(var i = 0; i<e.path.length; i++){
         ctx.fillStyle = "rgba(0,0,255,.1)";
+        //One wave above
+        ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, (e.path[i][1]+2)*(CURRENTBLOCKS_H), CURRENTBLOCKS_W, CURRENTBLOCKS_H);
+        //One wave below
+        ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, (e.path[i][1]-2)*(CURRENTBLOCKS_H), CURRENTBLOCKS_W, CURRENTBLOCKS_H);        
+        //Main wave
         ctx.fillRect(e.path[i][0]*CURRENTBLOCKS_W, e.path[i][1]*CURRENTBLOCKS_H, CURRENTBLOCKS_W, CURRENTBLOCKS_H);
       }
     }
@@ -457,10 +474,12 @@ function deleteCurrents(){
 
 function drawBubbles(){
   gameInfo.bubbles.forEach(function(e){
+    ctx.fillStyle = "rgba(255,255,255,.5)";
     ctx.beginPath();
     ctx.arc(e.position[0], e.position[1], BUBBLE_SIZE, 0, 2*Math.PI, true);
     ctx.closePath();
     ctx.stroke();
+    ctx.fill();
     ctx.font = "30px Arial";
     ctx.textAlign = "center";
     ctx.fillStyle = "black";
@@ -650,6 +669,8 @@ function updateGame(){
       gameInfo.timer -= 1;
     }
     redrawAllGame();
+    //TODO: Change 100 to the max length of any 1 current
+    animationCounter = (animationCounter>=100) ? 0 : animationCounter+1;
 }
 //---------------------------SCREEN:END
 //#####################################
