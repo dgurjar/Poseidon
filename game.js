@@ -21,7 +21,7 @@ var projectileCounter = 0;
 var bubbleCounter = 0;
 
 //State, 1=menu, 2= in menu, 3=game, 4=in game, 5=game over, 6=in game over, 7=instructions, 8=in instructions,9=difficulty, 10=in difficulty, 11=winning, 12=in winning
-var state=11;
+var state=1;
 
 //A counter for drawing the path of the current
 var animationCounter = 0;
@@ -64,8 +64,13 @@ function initInstructions(){
 
 function Instructions() {
   this.instructionsIndex=0;
-  this.instructionsList=[new Instruction('arrows.jpg','Use the left and right arrow keys to navigate the instructions.'), new Instruction('space.jpg','While playing the game, hit the space button to delete currents'),new Instruction('escape.jpg','Hit the escape key at any point (now or in the game) to return to the main menu.'),new Instruction('drowning.jpg',"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")];
-  
+  this.instructionsList=[
+  new Instruction('arrows.jpg','Use the left and right arrow keys to navigate the instructions.'),
+  new Instruction('drowning.jpg', 'A person is drowning trying to scream for help. You are Poseidon. Save them from running out of air.'), 
+  new Instruction('trident.jpg', 'Use your trident to draw currents and guide the "help bubbles"'), 
+  new Instruction('space.jpg','While playing the game, hit the space button to delete your currents'),
+  new Instruction('rock.jpg','Watch out for the rocks. They will pop the "help" bubbles.'),
+  new Instruction('escape.jpg','Hit the escape key at any point (now or in the game) to return to the main menu.')]; 
   //methods
 
   this.nextInstruction=function(){
@@ -739,10 +744,12 @@ function initWinScreen(){
   ctx.font = "50px Arial";
   ctx.textAlign = "center";
   ctx.fillStyle = "black";
-  ctx.fillText("YOU WIN!",WIDTH*.5, HEIGHT*.2);
+  ctx.fillText("THEY'RE SAFE!",WIDTH*.5, HEIGHT*.2);
   ctx.font="15px Arial";
-  ctx.fillText("Saving lives is awesome. You are awesome.",WIDTH*.5,HEIGHT*.2+35);
-  ctx.fillText("Hit the escape key to return to the main menu.",WIDTH*.5,HEIGHT*.2+55);
+    ctx.fillText("You guided the currents and they were able to call for help.",WIDTH*.5,HEIGHT*.2+35);
+  ctx.fillText("Saving lives is awesome. You are awesome.",WIDTH*.5,HEIGHT*.2+55);
+  ctx.fillText("Hit the escape key to return to the main menu.",WIDTH*.5,HEIGHT*.2+75);
+
   var img = new Image();
   //load image
   img.onload = function() {
