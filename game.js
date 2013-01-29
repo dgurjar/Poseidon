@@ -20,7 +20,7 @@ var lastBlock;
 var projectileCounter = 0;
 var bubbleCounter = 0;
 
-//State, 1=menu, 2= in menu, 3=game, 4=in game, 5=game over, 6=in game over, 7=instructions, 8=in instructions,9=difficulty, 10=in difficulty
+//State, 1=menu, 2= in menu, 3=game, 4=in game, 5=game over, 6=in game over, 7=instructions, 8=in instructions,9=difficulty, 10=in difficulty, 11=winning, 12=in winning
 var state=1;
 
 //-----------------------------CONSTANTS
@@ -659,6 +659,16 @@ function initEndScreen(){
   ctx.textAlign = "center";
   ctx.fillStyle = "black";
   ctx.fillText("END OF GAME",WIDTH*.5, HEIGHT*.2);
+}
+
+//--------------------------SCREEN:WINNING
+//########################################
+function initEndScreen(){
+  ctx.clearRect(0, 0, 400, 800);
+  ctx.font = "50px Arial";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "black";
+  ctx.fillText("YOU WON!",WIDTH*.5, HEIGHT*.2);
 }
 
 //---------------------------MISCELLANEOUS METHODS
