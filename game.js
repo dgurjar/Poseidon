@@ -197,7 +197,7 @@ function onMouseUpDifficulty(event)
 function setEasy(){ //todo: change numbers according to difficulty
   PROJECTILE_SPAWN_TRESHOLD = 20;
   BUBBLE_SPAWN_THRESHOLD = 30;
-  TIMER_INITIAL = 300;
+  TIMER_INITIAL = 20;
 }
 
 function setMedium(){ //todo: change numbers according to difficulty
@@ -699,9 +699,8 @@ function updateGame(){
     updateBubbles();
     updateProjectiles();
     detectCollisions();
-    if(gameInfo.timer != 0){
-      gameInfo.timer -= 1;
-    }
+    if(gameInfo.timer !== 0) gameInfo.timer -= 1;
+    else if(gameInfo.timer === 0) state=5;
     redrawAllGame();
     //TODO: Change 100 to the max length of any 1 current
     animationCounter = (animationCounter>=100) ? 0 : animationCounter+1;
@@ -710,20 +709,52 @@ function updateGame(){
 //#####################################
 function initEndScreen(){
   ctx.clearRect(0, 0, 400, 800);
+  drawMenuBackground();
   ctx.font = "50px Arial";
   ctx.textAlign = "center";
   ctx.fillStyle = "black";
-  ctx.fillText("END OF GAME",WIDTH*.5, HEIGHT*.2);
+  ctx.fillText("GAME OVER",WIDTH*.5, HEIGHT*.2);
+  ctx.font="15px Arial";
+  ctx.fillText("Get better. Play more. Save people.",WIDTH*.5,HEIGHT*.2+35);
+  ctx.fillText("Hit the escape key to return to the main menu.",WIDTH*.5,HEIGHT*.2+55);
+  var img = new Image();
+  //load image
+  img.onload = function() {
+    ctx.drawImage(img, WIDTH*.1, HEIGHT*.2+100, WIDTH*.8, HEIGHT*.3);
+  }
+  img.src ='poseidonfail.jpg';
+}
+
+function onKeyDownEndScreen(event){
+  var keyCode = event.keyCode;
+  //escape key
+  if (keyCode===27) state=1;
 }
 
 //--------------------------SCREEN:WINNING
 //########################################
-function initEndScreen(){
+function initWinScreen(){
   ctx.clearRect(0, 0, 400, 800);
+  drawMenuBackground();
   ctx.font = "50px Arial";
   ctx.textAlign = "center";
   ctx.fillStyle = "black";
-  ctx.fillText("YOU WON!",WIDTH*.5, HEIGHT*.2);
+  ctx.fillText("YOU WIN!",WIDTH*.5, HEIGHT*.2);
+  ctx.font="15px Arial";
+  ctx.fillText("Saving lives is awesome. You are awesome.",WIDTH*.5,HEIGHT*.2+35);
+  ctx.fillText("Hit the escape key to return to the main menu.",WIDTH*.5,HEIGHT*.2+55);
+  var img = new Image();
+  //load image
+  img.onload = function() {
+    ctx.drawImage(img, WIDTH*.1, HEIGHT*.2+100, WIDTH*.8, HEIGHT*.3);
+  }
+  img.src ='poseidonwin.jpg';
+}
+
+function onKeyDownWinScreen(event){
+  var keyCode = event.keyCode;
+  //escape key
+  if (keyCode===27) state=1;
 }
 
 //---------------------------MISCELLANEOUS METHODS
@@ -764,12 +795,15 @@ function onKeyDown(event){
   case 5: //initialize end screen
     break;
   case 6: //currently in end screen
+    onKeyDownEndScreen(event);
     break;
   case 7: //initialize instructions
     break;
   case 8: //currently in instructions
     onKeyDownInstructions(event);
     break;
+  case 12:
+    onKeyDownWinScreen(event);
   }
 }
 
@@ -871,9 +905,14 @@ function onTimer(){ //todo:add default state to everything
     break;
   case 10:
     break;
+  case 11:
+    initWinScreen();
+    state=12;
+    break;
+  case 12:
+    break;
   default:
     state=1;
-    break;
   }
 }
 
