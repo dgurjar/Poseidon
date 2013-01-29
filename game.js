@@ -513,12 +513,12 @@ function drawTimer(){
   ctx.font = "15px Arial";
   ctx.fillStyle = "black";
   ctx.textAlign = "left";
-  ctx.fillText("Air",10,30);
+  ctx.fillText("Air",WIDTH-40,20);
   //ctx.fillText(gameInfo.timer + "", 40, 40);
 
   //Create progress bar
   ctx.fillStyle = "#1826B0" //blue
-  ctx.fillRect(10, 5,WIDTH*.9*(gameInfo.timer/TIMER_INITIAL),10);
+  ctx.fillRect(WIDTH-13, HEIGHT-HEIGHT*(gameInfo.timer/TIMER_INITIAL),10, HEIGHT*(gameInfo.timer/TIMER_INITIAL));
 }
 
 function addBubble(){
