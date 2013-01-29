@@ -193,19 +193,17 @@ function onMouseUpDifficulty(event)
 {
   var x = event.pageX - canvas.offsetLeft;
   var y = event.pageY - canvas.offsetTop;
-  console.log("x:"+x+" y:"+y);
-  //if button1
+  //if easy button
   if(x>=(WIDTH*.25) &&x<=(WIDTH*.75)&&y>=(HEIGHT*.3) && y<=(HEIGHT*.3+80)) {
     setEasy();
     state=3;
   }
-  //else button2
+  //else medium button
   else if(x>=(WIDTH*.25) &&x<=(WIDTH*.75)&&y>=(HEIGHT*.3+100) && y<=(HEIGHT*.3+180)){
     setMedium();
     state=3;
   }
-
-  //else if button3
+  //else if hard button
   else if(x>=(WIDTH*.25) &&x<=(WIDTH*.75)&&y>=(HEIGHT*.3+200) && y<=(HEIGHT*.3+280)){
     setHard();
     state=3;
@@ -270,7 +268,6 @@ function onMouseUpMenu(event)
 {
   var x = event.pageX - canvas.offsetLeft;
   var y = event.pageY - canvas.offsetTop;
-  console.log("x:"+x+" y:"+y);
   //if box1
   if(x>=(WIDTH*.25) &&x<=(WIDTH*.75)&&y>=(HEIGHT*.3) && y<=(HEIGHT*.3+80)) {
     state=9;
@@ -351,7 +348,6 @@ function blockClaimed(blockCoords){
   return gameInfo.grid[blockCoords] || false;  //uses the falsiness of the undefined value.
 }
 
-//TODO: Fix the way currents are rendered and stored
 function onMouseDownGame(event)
 {
   //start drawing the current or start creating the current, however we want it implemented.
@@ -371,8 +367,6 @@ function onMouseDownGame(event)
 
     lastBlock = blockCoords;
   }
-
-  //console.log("Mouse Down: " + x + ", " + y);
 }
 
 
@@ -397,7 +391,6 @@ function onMouseMoveGame(event){
           gameInfo.currents.pop();
           currentIndex = -1;
           lastBlock = null;
-          console.log("stopped drawing.");
         }
       }
     }
@@ -410,7 +403,6 @@ function onMouseUpGame(event){
     var y = event.pageY - canvas.offsetTop;
     var c = gameInfo.currents[currentIndex];
 
-    //TODO: Re-add current measurement, restrict current from being drawn if not enough "ink"
     c.ready = true;
     currentIndex = -1;
     isDrawing = 0;
@@ -467,7 +459,6 @@ function drawBackground(){
   ctx.fillRect(0,0, WIDTH, HEIGHT);
 }
 
-//TODO: We want to save the currents and then redraw them
 function drawCurrents(){
   gameInfo.currents.forEach(function(e){
     //Draw without alpha
@@ -564,7 +555,6 @@ function drawLetterDest(){
               (WIDTH*.125*7), 50);
 }
 
-//TODO: Make this vertical
 function drawTimer(){
   //Create number
   ctx.beginPath();
@@ -572,7 +562,6 @@ function drawTimer(){
   ctx.fillStyle = "white";
   ctx.textAlign = "left";
   ctx.fillText("Air",WIDTH-40,HEIGHT-20);
-  //ctx.fillText(gameInfo.timer + "", 40, 40);
 
   //Create progress bar
   ctx.fillStyle = "rgba(255, 255, 255, .8)" //transparent white
@@ -634,7 +623,6 @@ function updateAndRemoveBubbles(){
       if(e.position[1]<=0)
         toRemove.push(i);
       if(determineBubbleSuccess(e.letter, e.position[0])){
-        //TODO: Increment the score or reward the player here.
         if(e.letter === "H")
           progressCounter[0]++;
         else if(e.letter === "E")
@@ -659,6 +647,8 @@ function updateAndRemoveBubbles(){
   });
 }
 
+//Simple win condition that checks if each destination has recieved the
+//right number of buckets
 function isWin(){
   for(var i = 0; i<progressCounter.length; i++){
     if(progressCounter[i] < LETTER_COUNT_WIN)
@@ -712,6 +702,8 @@ function isOverlapping(a, b){
   return !(a[0] > b[2] || a[1] > b[3] || a[2] < b[0] || a[3] < b[1]);
 }
 
+
+//TODO: Animate this later
 function popBubbles(bcoords, pcoords){
   var toClear = [];
   bcoords.forEach(function(bc, i){
@@ -761,13 +753,8 @@ function advanceLockedBubbles(){
       var destCoords = blockCoordsToRealCoords(b.currentPath[0][0], b.currentPath[0][1]);
       var xdist = destCoords[0] - b.position[0];
       var ydist = destCoords[1] - b.position[1];
-      //console.log("destcoords x: " + destCoords[0] + " destCoords y: " + destCoords[1]);
-      //console.log("Before: " + b.position[0] + ", " + b.position[1]);
-      //console.log("xdist: " + xdist + ", ydist: " + ydist);
       b.position[0] = b.position[0] + (xdist > 0 ? Math.floor(xdist, 1) : Math.ceil(xdist, -1));
       b.position[1] = b.position[1] + (ydist > 0 ? Math.floor(ydist, 1) : Math.ceil(ydist, -1));
-      //console.log("+      " + (xdist > 0 ? Math.floor(xdist, 3) : Math.ceil(xdist, -3)) + ", " + (ydist > 0 ? Math.floor(ydist, 3) : Math.ceil(ydist, -3)));
-      //console.log("After: " + b.position[0] + ", " + b.position[1]);
       if(b.position.toString() === destCoords.toString()){
         b.currentPath.splice(0, 1);
         //this is a temporary solution to a bubble being caught in its last block of current forever.
@@ -804,8 +791,7 @@ function updateGame(){
     if(gameInfo.timer !== 0) gameInfo.timer -= 1;
     else if(gameInfo.timer === 0) state=5;
     redrawAllGame();
-    //TODO: Change 100 to the max length of any 1 current
-    animationCounter = (animationCounter>=100) ? 0 : animationCounter+1;
+    animationCounter = animationCounter+1;
 }
 //---------------------------SCREEN:END
 //#####################################
