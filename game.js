@@ -68,8 +68,13 @@ function initInstructions(){
 
 function Instructions() {
   this.instructionsIndex=0;
-  this.instructionsList=[new Instruction('arrows.jpg','Use the left and right arrow keys to navigate the instructions.'), new Instruction('space.jpg','While playing the game, hit the space button to delete currents'),new Instruction('escape.jpg','Hit the escape key at any point (now or in the game) to return to the main menu.'),new Instruction('drowning.jpg',"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")];
-  
+  this.instructionsList=[
+  new Instruction('arrows.jpg','Use the left and right arrow keys to navigate the instructions.'),
+  new Instruction('drowning.jpg', 'A person is drowning trying to scream for help. You are Poseidon. Save them from running out of air.'), 
+  new Instruction('trident.jpg', 'Use your trident to draw currents and guide the "help bubbles"'), 
+  new Instruction('space.jpg','While playing the game, hit the space button to delete your currents'),
+  new Instruction('rock.jpg','Watch out for the rocks. They will pop the "help" bubbles.'),
+  new Instruction('escape.jpg','Hit the escape key at any point (now or in the game) to return to the main menu.')]; 
   //methods
 
   this.nextInstruction=function(){
@@ -765,9 +770,8 @@ function updateGame(){
     updateBubbles();
     updateProjectiles();
     detectCollisions();
-    if(gameInfo.timer != 0){
-      gameInfo.timer -= 1;
-    }
+    if(gameInfo.timer !== 0) gameInfo.timer -= 1;
+    else if(gameInfo.timer === 0) state=5;
     redrawAllGame();
     //TODO: Change 100 to the max length of any 1 current
     animationCounter = (animationCounter>=100) ? 0 : animationCounter+1;
@@ -776,20 +780,54 @@ function updateGame(){
 //#####################################
 function initEndScreen(){
   ctx.clearRect(0, 0, 400, 800);
+  drawMenuBackground();
   ctx.font = "50px Arial";
   ctx.textAlign = "center";
   ctx.fillStyle = "black";
-  ctx.fillText("END OF GAME",WIDTH*.5, HEIGHT*.2);
+  ctx.fillText("GAME OVER",WIDTH*.5, HEIGHT*.2);
+  ctx.font="15px Arial";
+  ctx.fillText("Get better. Play more. Save people.",WIDTH*.5,HEIGHT*.2+35);
+  ctx.fillText("Hit the escape key to return to the main menu.",WIDTH*.5,HEIGHT*.2+55);
+  var img = new Image();
+  //load image
+  img.onload = function() {
+    ctx.drawImage(img, WIDTH*.1, HEIGHT*.2+100, WIDTH*.8, HEIGHT*.3);
+  }
+  img.src ='poseidonfail.jpg';
+}
+
+function onKeyDownEndScreen(event){
+  var keyCode = event.keyCode;
+  //escape key
+  if (keyCode===27) state=1;
 }
 
 //--------------------------SCREEN:WINNING
 //########################################
-function initEndScreen(){
+function initWinScreen(){
   ctx.clearRect(0, 0, 400, 800);
+  drawMenuBackground();
   ctx.font = "50px Arial";
   ctx.textAlign = "center";
   ctx.fillStyle = "black";
-  ctx.fillText("YOU WON!",WIDTH*.5, HEIGHT*.2);
+  ctx.fillText("THEY'RE SAFE!",WIDTH*.5, HEIGHT*.2);
+  ctx.font="15px Arial";
+    ctx.fillText("You guided the currents and they were able to call for help.",WIDTH*.5,HEIGHT*.2+35);
+  ctx.fillText("Saving lives is awesome. You are awesome.",WIDTH*.5,HEIGHT*.2+55);
+  ctx.fillText("Hit the escape key to return to the main menu.",WIDTH*.5,HEIGHT*.2+75);
+
+  var img = new Image();
+  //load image
+  img.onload = function() {
+    ctx.drawImage(img, WIDTH*.1, HEIGHT*.2+100, WIDTH*.8, HEIGHT*.3);
+  }
+  img.src ='poseidonwin.jpg';
+}
+
+function onKeyDownWinScreen(event){
+  var keyCode = event.keyCode;
+  //escape key
+  if (keyCode===27) state=1;
 }
 
 //---------------------------MISCELLANEOUS METHODS
@@ -830,12 +868,15 @@ function onKeyDown(event){
   case 5: //initialize end screen
     break;
   case 6: //currently in end screen
+    onKeyDownEndScreen(event);
     break;
   case 7: //initialize instructions
     break;
   case 8: //currently in instructions
     onKeyDownInstructions(event);
     break;
+  case 12:
+    onKeyDownWinScreen(event);
   }
 }
 
@@ -937,9 +978,14 @@ function onTimer(){ //todo:add default state to everything
     break;
   case 10:
     break;
+  case 11:
+    initWinScreen();
+    state=12;
+    break;
+  case 12:
+    break;
   default:
     state=1;
-    break;
   }
 }
 
