@@ -1,3 +1,11 @@
+/* POSEIDON */
+/*----------*/
+/* Created for 15-237 by:
+ * Cory Williams	(cjwillia) 
+ * Dev Gurjar		(dgurjar)
+ * Sank Kulshreshta (sankalpk)
+ */
+
 var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext('2d');
 
