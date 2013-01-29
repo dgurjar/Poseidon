@@ -50,7 +50,7 @@ var CURRENTBLOCKS_W = 10;
 var CURRENTBLOCKS_H = 10;
 
 //Initial time
-var TIMER_INITIAL=10000;
+var TIMER_INITIAL=5000;
 
 //Sizes
 var BUBBLE_SIZE = 20;
@@ -210,22 +210,22 @@ function onMouseUpDifficulty(event)
   }
 }
 
-function setEasy(){ //todo: change numbers according to difficulty
-  PROJECTILE_SPAWN_TRESHOLD = 20;
-  BUBBLE_SPAWN_THRESHOLD = 30;
-  //TIMER_INITIAL = 300;
+function setEasy(){
+  PROJECTILE_SPAWN_TRESHOLD = 25;
+  BUBBLE_SPAWN_THRESHOLD = 28;
+  LETTER_COUNT_WIN = 1;
 }
 
-function setMedium(){ //todo: change numbers according to difficulty
-  PROJECTILE_SPAWN_TRESHOLD = 20;
-  BUBBLE_SPAWN_THRESHOLD = 30;
-  //TIMER_INITIAL = 300;
+function setMedium(){
+  PROJECTILE_SPAWN_TRESHOLD = 22;
+  BUBBLE_SPAWN_THRESHOLD = 29;
+  LETTER_COUNT_WIN = 2;
 }
 
-function setHard(){ //todo: change numbers according to difficulty
+function setHard(){
   PROJECTILE_SPAWN_TRESHOLD = 20;
   BUBBLE_SPAWN_THRESHOLD = 30;
-  //TIMER_INITIAL = 300;
+  LETTER_COUNT_WIN = 3;
 }
 
 function drawDifficultyTitle(){
