@@ -50,11 +50,14 @@ var CURRENTBLOCKS_W = 10;
 var CURRENTBLOCKS_H = 10;
 
 //Initial time
-var TIMER_INITIAL=500;
+var TIMER_INITIAL=10000;
 
 //Sizes
 var BUBBLE_SIZE = 20;
 var PROJECTILE_SIZE = 60;
+
+//How many letters need to reach the destination for a win
+var LETTER_COUNT_WIN = 1;
 
 
 
@@ -206,19 +209,19 @@ function onMouseUpDifficulty(event)
 function setEasy(){ //todo: change numbers according to difficulty
   PROJECTILE_SPAWN_TRESHOLD = 20;
   BUBBLE_SPAWN_THRESHOLD = 30;
-  TIMER_INITIAL = 300;
+  //TIMER_INITIAL = 300;
 }
 
 function setMedium(){ //todo: change numbers according to difficulty
   PROJECTILE_SPAWN_TRESHOLD = 20;
   BUBBLE_SPAWN_THRESHOLD = 30;
-  TIMER_INITIAL = 300;
+  //TIMER_INITIAL = 300;
 }
 
 function setHard(){ //todo: change numbers according to difficulty
   PROJECTILE_SPAWN_TRESHOLD = 20;
   BUBBLE_SPAWN_THRESHOLD = 30;
-  TIMER_INITIAL = 300;
+  //TIMER_INITIAL = 300;
 }
 
 function drawDifficultyTitle(){
@@ -627,13 +630,24 @@ function updateAndRemoveBubbles(){
         //This triggers the bubble to be recolored
         e.didReachDest = true;
 
-        //WIN CONDITION CHECK GOES HERE
+        //If we have won, transisiton states
+        if(isWin())
+          state = 11;
+
       }
     }
   });
   toRemove.forEach(function(e){
     gameInfo.bubbles.splice(e, 1);
   });
+}
+
+function isWin(){
+  for(var i = 0; i<progressCounter.length; i++){
+    if(progressCounter[i] < LETTER_COUNT_WIN)
+      return false;
+  }
+  return true;
 }
 
 function updateBubbles(){
