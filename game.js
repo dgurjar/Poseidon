@@ -419,10 +419,12 @@ function initGame(){
 function redrawAllGame(){
   ctx.clearRect(0, 0, 400, 800);
   drawBackground();
+  drawDrowningMan();
   drawCurrents();
   drawBubbles();
   drawProjectiles();
   drawTimer();
+  drawLetterDest();
 }
 
 function drawBackground(){
@@ -489,12 +491,29 @@ function drawBubbles(){
 
 function drawProjectiles(){
   gameInfo.projectiles.forEach(function(e){
-    ctx.beginPath();
-    ctx.fillStyle = "red";
-    ctx.fillRect(e.position[0]-PROJECTILE_SIZE/2, e.position[1]-PROJECTILE_SIZE/2, PROJECTILE_SIZE, PROJECTILE_SIZE);
+  
+  //TODO: Put this somewhere else
+  var image = new Image();
+  image.src = "rock.gif";
+    
+  //TODO: Rotate the projectiles
+  var spriteIndex = (animationCounter%36);
+  ctx.drawImage(image,0,0,300,215,e.position[0]-PROJECTILE_SIZE/2, e.position[1]-PROJECTILE_SIZE/2, PROJECTILE_SIZE, PROJECTILE_SIZE);
   });
 }
 
+function drawLetterDest(){
+  ctx.beginPath();
+  ctx.font = "30px Arial";
+  ctx.fillStyle = "rgba(0,0,0, .5)";
+  ctx.textAlign = "left";
+  ctx.fillText("H", (WIDTH*.125*1), 30);
+  ctx.fillText("E", (WIDTH*.125*3), 30);
+  ctx.fillText("L", (WIDTH*.125*5), 30);
+  ctx.fillText("P", (WIDTH*.125*7), 30);
+}
+
+//TODO: Make this vertical
 function drawTimer(){
   //Create number
   ctx.beginPath();
@@ -507,6 +526,24 @@ function drawTimer(){
   //Create progress bar
   ctx.fillStyle = "#1826B0" //blue
   ctx.fillRect(10, 5,WIDTH*.9*(gameInfo.timer/TIMER_INITIAL),10);
+}
+
+//Draws and animates the drowning man using a simple sprite
+function drawDrowningMan(){
+  //TODO: Load this image somewhere else
+  var image = new Image();
+  image.src = "drowning_sprite.png";
+
+  var spriteIndex = (animationCounter%36);
+
+  if(spriteIndex <9)
+    ctx.drawImage(image,0,0,219,317,WIDTH/2-55,HEIGHT-159,110,159);
+  else if(spriteIndex < 18)
+    ctx.drawImage(image,219*1,0,219,317,WIDTH/2-55,HEIGHT-159,110,159);
+  else if(spriteIndex <27)
+    ctx.drawImage(image,219*2,0,219,317,WIDTH/2-55,HEIGHT-159,110,159);
+  else
+    ctx.drawImage(image,219*1,0,219,317,WIDTH/2-55,HEIGHT-159,110,159);
 }
 
 function addBubble(){
