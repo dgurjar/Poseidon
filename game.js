@@ -72,12 +72,18 @@ function initInstructions(){
 function Instructions() {
   this.instructionsIndex=0;
   this.instructionsList=[
-  new Instruction('arrows.jpg','Use the left and right arrow keys to navigate the instructions.'),
-  new Instruction('drowning.jpg', 'A person is drowning trying to scream for help. You are Poseidon. Save them from running out of air.'), 
-  new Instruction('trident.jpg', 'Use your trident to draw currents and guide the "help bubbles"'), 
-  new Instruction('space.jpg','While playing the game, hit the space button to delete your currents'),
-  new Instruction('rock.jpg','Watch out for the rocks. They will pop the "help" bubbles.'),
-  new Instruction('escape.jpg','Hit the escape key at any point (now or in the game) to return to the main menu.')]; 
+  new Instruction('arrows.jpg',
+                  'Use the left and right arrow keys to navigate the instructions.'),
+  new Instruction('drowning.jpg', 
+                  'A person is drowning trying to scream for help. You are Poseidon. Save them from running out of air.'), 
+  new Instruction('trident.jpg', 
+                  'Use your trident (left click and drag) to draw currents and guide the "help bubbles"'), 
+  new Instruction('space.jpg',
+                  'While playing the game, hit the space button to delete your currents'),
+  new Instruction('rock.jpg',
+                  'Watch out for the rocks. They will pop the "help" bubbles.'),
+  new Instruction('escape.jpg',
+                  'Hit the escape key at any point (now or in the game) to return to the main menu.')]; 
   //methods
 
   this.nextInstruction=function(){
@@ -541,10 +547,20 @@ function drawLetterDest(){
   ctx.fillStyle = "rgba(0,0,0, .5)";
   ctx.textAlign = "left";
   ctx.fillText("H", (WIDTH*.125*1), 30);
-  //ctx.fillText(+"/"+, )
   ctx.fillText("E", (WIDTH*.125*3), 30);
   ctx.fillText("L", (WIDTH*.125*5), 30);
   ctx.fillText("P", (WIDTH*.125*7), 30);
+
+  /* Feedback for how many more letters you need in the dest */
+  ctx.font = "20px Arial";
+  ctx.fillText(Math.min(LETTER_COUNT_WIN, progressCounter[0])+"/"+LETTER_COUNT_WIN,
+              (WIDTH*.125*1), 50);
+  ctx.fillText(Math.min(LETTER_COUNT_WIN, progressCounter[1])+"/"+LETTER_COUNT_WIN, 
+              (WIDTH*.125*3), 50);
+  ctx.fillText(Math.min(LETTER_COUNT_WIN, progressCounter[2])+"/"+LETTER_COUNT_WIN,
+              (WIDTH*.125*5), 50);
+  ctx.fillText(Math.min(LETTER_COUNT_WIN, progressCounter[3])+"/"+LETTER_COUNT_WIN,
+              (WIDTH*.125*7), 50);
 }
 
 //TODO: Make this vertical
