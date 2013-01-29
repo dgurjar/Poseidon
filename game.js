@@ -202,7 +202,7 @@ function onMouseUpDifficulty(event)
 function setEasy(){ //todo: change numbers according to difficulty
   PROJECTILE_SPAWN_TRESHOLD = 20;
   BUBBLE_SPAWN_THRESHOLD = 30;
-  TIMER_INITIAL = 20;
+  TIMER_INITIAL = 300;
 }
 
 function setMedium(){ //todo: change numbers according to difficulty
