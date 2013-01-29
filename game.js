@@ -294,6 +294,7 @@ function drawMenuButtons(){
 }
 
 function initMenu() {
+  removeTridentCursor();
   drawMenuBackground();
   drawMenuTitle();
   drawMenuButtons();
@@ -302,6 +303,7 @@ function initMenu() {
 //---------------------------SCREEN:GAME
 //######################################
 function initializeGameInfo(){
+  addTridentCursor();
   var gameInfo = new Object();
   gameInfo.timer = TIMER_INITIAL;
   gameInfo.currentRemaining = 1000;
@@ -411,6 +413,13 @@ function onKeyDownGame(event){
   
 }
 
+function addTridentCursor(){
+  canvas.style.cursor="url(trident.png) 0 0,auto";
+}
+
+function removeTridentCursor(){
+  canvas.style.cursor="auto";
+}
 function initGame(){
   gameInfo = initializeGameInfo();
   redrawAllGame();
