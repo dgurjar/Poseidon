@@ -76,11 +76,11 @@ function Instructions() {
                   'Use the left and right arrow keys to navigate the instructions.'),
   new Instruction('drowning.jpg', 
                   'A person is drowning trying to scream for help. You are Poseidon. Save them from running out of air.'), 
-  new Instruction('trident.jpg', 
+  new Instruction('trident.png', 
                   'Use your trident (left click and drag) to draw currents and guide the "help bubbles"'), 
   new Instruction('space.jpg',
                   'While playing the game, hit the space button to delete your currents'),
-  new Instruction('rock.jpg',
+  new Instruction('rock.gif',
                   'Watch out for the rocks. They will pop the "help" bubbles.'),
   new Instruction('escape.jpg',
                   'Hit the escape key at any point (now or in the game) to return to the main menu.')]; 
