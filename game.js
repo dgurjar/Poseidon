@@ -26,6 +26,10 @@ var state=1;
 //A counter for drawing the path of the current
 var animationCounter = 0;
 
+//Counts how close we are to completing each of the 4 slots
+var progressCounter = [0, 0, 0, 0];
+
+
 //-----------------------------CONSTANTS
 //######################################
 
@@ -46,7 +50,7 @@ var CURRENTBLOCKS_W = 10;
 var CURRENTBLOCKS_H = 10;
 
 //Initial time
-var TIMER_INITIAL=300;
+var TIMER_INITIAL=500;
 
 //Sizes
 var BUBBLE_SIZE = 20;
@@ -213,10 +217,12 @@ function setHard(){ //todo: change numbers according to difficulty
 }
 
 function drawDifficultyTitle(){
-  ctx.font = "50px Arial";
+  ctx.font = "30px Arial";
   ctx.textAlign = "center";
   ctx.fillStyle = "#223947";
-  ctx.fillText("Difficulty",WIDTH*.5, HEIGHT*.2);
+  ctx.fillText("DIFFICULTY",WIDTH*.5, HEIGHT*.2+5);
+  ctx.fillStyle = "white";
+  ctx.fillText("DIFFICULTY",WIDTH*.5, HEIGHT*.2);
 }
 
 function drawDifficultyButtons(){
@@ -266,6 +272,8 @@ function drawMenuTitle(){
   ctx.textAlign = "center";
   ctx.fillStyle = "#223947";
   ctx.fillText("POSEIDON",WIDTH*.5, HEIGHT*.2);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillText("POSEIDON",WIDTH*.5, HEIGHT*.2+10);
 }
 
 function drawMenuBackground(){
@@ -488,7 +496,11 @@ function deleteCurrents(){
 
 function drawBubbles(){
   gameInfo.bubbles.forEach(function(e){
-    ctx.fillStyle = "rgba(255,255,255,.5)";
+    /* If this bubble reached its destination, color it differently */
+    if(e.didReachDest)
+      ctx.fillStyle = "rgba(255,255, 0,.5)";
+    else
+      ctx.fillStyle = "rgba(255,255,255,.5)";
     ctx.beginPath();
     ctx.arc(e.position[0], e.position[1], BUBBLE_SIZE, 0, 2*Math.PI, true);
     ctx.closePath();
@@ -503,14 +515,15 @@ function drawBubbles(){
 
 function drawProjectiles(){
   gameInfo.projectiles.forEach(function(e){
-  
-  //TODO: Put this somewhere else
-  var image = new Image();
-  image.src = "rock.gif";
-    
-  //TODO: Rotate the projectiles
-  var spriteIndex = (animationCounter%36);
-  ctx.drawImage(image,0,0,300,215,e.position[0]-PROJECTILE_SIZE/2, e.position[1]-PROJECTILE_SIZE/2, PROJECTILE_SIZE, PROJECTILE_SIZE);
+    var image = new Image();
+    image.src = "rock.gif";
+      
+    //TODO: Rotate the projectiles
+    var spriteIndex = (animationCounter%36);
+    ctx.drawImage(image,0,0,300,215,
+                  e.position[0]-PROJECTILE_SIZE/2, 
+                  e.position[1]-PROJECTILE_SIZE/2, 
+                  PROJECTILE_SIZE, PROJECTILE_SIZE);
   });
 }
 
@@ -520,6 +533,7 @@ function drawLetterDest(){
   ctx.fillStyle = "rgba(0,0,0, .5)";
   ctx.textAlign = "left";
   ctx.fillText("H", (WIDTH*.125*1), 30);
+  //ctx.fillText(+"/"+, )
   ctx.fillText("E", (WIDTH*.125*3), 30);
   ctx.fillText("L", (WIDTH*.125*5), 30);
   ctx.fillText("P", (WIDTH*.125*7), 30);
@@ -530,19 +544,18 @@ function drawTimer(){
   //Create number
   ctx.beginPath();
   ctx.font = "15px Arial";
-  ctx.fillStyle = "black";
+  ctx.fillStyle = "white";
   ctx.textAlign = "left";
-  ctx.fillText("Air",WIDTH-40,20);
+  ctx.fillText("Air",WIDTH-40,HEIGHT-20);
   //ctx.fillText(gameInfo.timer + "", 40, 40);
 
   //Create progress bar
-  ctx.fillStyle = "#1826B0" //blue
+  ctx.fillStyle = "rgba(255, 255, 255, .8)" //transparent white
   ctx.fillRect(WIDTH-13, HEIGHT-HEIGHT*(gameInfo.timer/TIMER_INITIAL),10, HEIGHT*(gameInfo.timer/TIMER_INITIAL));
 }
 
 //Draws and animates the drowning man using a simple sprite
 function drawDrowningMan(){
-  //TODO: Load this image somewhere else
   var image = new Image();
   image.src = "drowning_sprite.png";
 
@@ -564,6 +577,7 @@ function addBubble(){
   bubble.letter = LETTERS[Math.floor(Math.random()*4)];
   bubble.position = [Math.floor(Math.random()*WIDTH + 1), HEIGHT];
   bubble.currentPath = [];
+  bubble.didReachDest = false;
   gameInfo.bubbles.push(bubble);
 }
 
@@ -590,10 +604,25 @@ function updateAndRemoveBubbles(){
     if(e.currentPath.length === 0){
       e.position[1] = e.position[1] - 5;
     }
-    if(e.position[1] <= 0){
-      toRemove.push(i);
+    //Check if the bubble reached where it is supposed to
+    if(!e.didReachDest &&  e.position[1] <= (HEIGHT*.1)){
+      if(e.position[1]<=0)
+        toRemove.push(i);
       if(determineBubbleSuccess(e.letter, e.position[0])){
         //TODO: Increment the score or reward the player here.
+        if(e.letter === "H")
+          progressCounter[0]++;
+        else if(e.letter === "E")
+          progressCounter[1]++;
+        else if(e.letter === "L")
+          progressCounter[2]++;
+        else if(e.letter === "P")
+          progressCounter[3]++;
+
+        //This triggers the bubble to be recolored
+        e.didReachDest = true;
+
+        //WIN CONDITION CHECK GOES HERE
       }
     }
   });
