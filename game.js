@@ -381,8 +381,9 @@ function onMouseMoveGame(event){
       var x = event.pageX - canvas.offsetLeft;
       var y = event.pageY - canvas.offsetTop;
       var blockCoords = getCurrentBlockCoords(x,y);
-      if(!(blockClaimed(blockCoords))){
-        gameInfo.currents[currentIndex].path.push(blockCoords);
+      var path = gameInfo.currents[currentIndex].path;
+      if(!(blockClaimed(blockCoords)) && path!==undefined){
+        path.push(blockCoords);
         gameInfo.grid[blockCoords] = true;
         lastBlock = blockCoords;
       }
