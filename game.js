@@ -21,7 +21,7 @@ var projectileCounter = 0;
 var bubbleCounter = 0;
 
 //State, 1=menu, 2= in menu, 3=game, 4=in game, 5=game over, 6=in game over, 7=instructions, 8=in instructions,9=difficulty, 10=in difficulty, 11=winning, 12=in winning
-var state=1;
+var state=11;
 
 //A counter for drawing the path of the current
 var animationCounter = 0;
